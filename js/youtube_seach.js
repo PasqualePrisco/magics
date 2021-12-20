@@ -1,7 +1,7 @@
 var youtubeReady = false;
 
 function initYoutube() {
-  gapi.client.setApiKey("AIzaSyBvO-WnjLG4juE7LXr-ZzDGwTMnZ4pQKIw");
+  gapi.client.setApiKey("AIzaSyDVmNiTQl_aXwi1IRsHnY0bPh2_DqjHzR8");
   gapi.client.load("youtube", "v3", function () {
     youtubeReady = true;
   });
