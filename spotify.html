@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <meta content='width=device-width, initial-scale=1' name='viewport' />
+    <title>Google</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+
+    <script src="js/external/NoSleep.min.js"></script>
+    <script>
+        var noSleep = new NoSleep();
+
+        var wakeLockEnabled = false;
+        window.addEventListener('click', function () {
+            if (!wakeLockEnabled) {
+                noSleep.enable();
+                wakeLockEnabled = true;
+            }
+        }, false);
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div id="page">
+        </div>
+    </div>
+
+    <style>
+        html,
+        body {
+            font-family: 'Roboto', sans-serif;
+            height: 100%;
+            overflow: hidden;
+            color: #292929;
+            text-align: center;
+            font-size: 20pt;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            min-height: 90%;
+        }
+
+        #page {
+            scale: 1.5;
+            width: 200px;
+            min-height: 200px;
+            height: auto;
+            background-color: #d6d6d6;
+            border-radius: 10px;
+            align-self: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            justify-content: space-between;
+        }
+
+        .icon {
+            background-image: url(img/youtube.png);
+            background-size: contain;
+            background-repeat: no-repeat;
+            padding: 30px;
+            border-radius: 20px;
+            background-position: center;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        span {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <script>
+        function showContent(type) {
+            if (type == "missing-id") {
+                $("#page").html(`
+                    <img src="img/warning.png" height="70px"/>
+                    <span>You forgot to add your special word to the link!</span>
+                    <span style="font-size: 13pt; color: #575757;">For a full explanation check the SongNote app settings!</span>
+                `)
+            }
+            else if (type == "select-source") {
+                $("#page").html(`
+                    <span style="font-size: 20pt;">Click the platform!</span>
+                    <div class="icon" onclick="setSource('youtube')"></div>
+                    <span style="font-size: 16pt; color: #575757;">More platform will be added in future...</span>
+                    <span style="font-size: 13pt; color: #575757;">For a full explanation check the SongNote app settings!</span>
+                `)
+            }
+            else if (type == "loading") {
+                $("#page").html(`
+                    <span style="font-size: 20pt;">Waiting for the user to type on SongNote.</span>
+                    <img src="img/loading.gif" width="100px"/>
+                    <span style="font-size: 17pt;">You can now leave the phone upside down.</span>
+                    <span style="font-size: 13pt; color: #575757;">For a full explanation check the SongNote app settings!</span>
+                `)
+            } else {
+                $("#page").html(`
+                    <span>Unknown content: ${type}\n Please, try refreshing the webpage!</span>
+                    <span style="font-size: 13pt; color: #575757;">For a full explanation check the SongNote app settings!</span>
+                `)
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+    <!-- TODO: QUA SOTTO NON CI DEVE ANDARE NIENTE-->
+
+
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js"></script>
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-firestore.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="js/spotify_search.js"></script>
+    <script src="https://apis.google.com/js/client.js?onload=initYoutube"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDmOlHXQJqGDUwyhqubxWkcFRU2dGGcilA",
+            authDomain: "magicsong-21387.firebaseapp.com",
+            databaseURL: "https://magicsong-21387.firebaseio.com",
+            projectId: "magicsong-21387",
+            storageBucket: "magicsong-21387.appspot.com",
+            messagingSenderId: "796232075681",
+            appId: "1:796232075681:web:aa2f17bcc4884ce80a23e0"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        $(document).ready(() => {
+            var search = window.location.search
+            console.log(search);
+            if (!search || search === "?" || !window.location.search.substring(1)) {
+                showContent("missing-id")
+                return;
+            }
+
+            //Seems like google plays doesn't like youtube logos (atm we directly select youtube)
+            //showContent("select-source")
+            setSource("spotify")
+        })
+
+        function setSource(source) {
+            showContent("loading")
+
+            var search = window.location.search.substring(1)
+
+            const database = firebase.firestore();
+            const usersCollection = database.collection("users");
+            usersCollection.where("parameter", "==", search).limit(1).onSnapshot(docs => {
+                docs.forEach(async doc => {
+                    const result = doc && doc.data() && doc.data().keyword
+                    if (result && result !== "") {
+                        if (source == "spotify")
+                            useSpotify(result);
+                        else
+                            console.error("Invalid source: ", source);
+
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
