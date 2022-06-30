@@ -1,11 +1,10 @@
 function getTrack(param, token) {
-    console.log(token);
     var settings = {
         "url": "https://api.spotify.com/v1/search?q=pastello%20bianco&type=track",
         "method": "GET",
         "timeout": 0,
         "headers": {
-            "Authorization": "Bearer BQD6bdrFENVPsnM7XgxgP-jBxk0iugDxeaM2rKQUZ7B3Wnh6BT69Xi3RLx1Oh-th0AaDUBCroMTOPLakjd6BidnjFpatGNPzVvfj9FGd4PPAA-6PdVY"
+            "Authorization": "Bearer " + token,
         },
     };
 
