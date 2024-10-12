@@ -18,11 +18,11 @@ async function useYoutube(param) {
   var isChrome =
     /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
   if (isChrome) {
-    window.location.replace(`https://www.youtube.com/watch?v=${id}&t=30s`);
+    window.location.replace(`https://www.youtube.com/watch?v=${id}&t=30s&autoplay=1&mute=1`);
   } else if (isAndroid) {
-    window.location = `vnd.youtube://${id}?t=30s`;
+    window.location = `vnd.youtube://${id}?t=30s&autoplay=1&mute=1`;
   } else {
-    window.location.replace(`https://www.youtube.com/watch?v=${id}&t=30s`);
+    window.location.replace(`https://www.youtube.com/watch?v=${id}&t=30s&autoplay=1&mute=1`);
   }
 }
 
